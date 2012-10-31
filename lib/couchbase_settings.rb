@@ -1,11 +1,7 @@
+require 'rails'
 require 'yaml'
 require 'erb'
 require "couchbase_settings/version"
-
-COUCHBASE_PATH = "#{File.dirname(__FILE__)}/couchbase_settings"
-puts COUCHBASE_PATH
-require "#{COUCHBASE_PATH}/railtie.rb"
-
 
 module CouchbaseSettings
   class UndefinedCouchbaseSettings < StandardError; end
@@ -19,16 +15,16 @@ module CouchbaseSettings
     def find_ymls
       main_file = "#{Rails.root.to_s}/config/couchbase.yml"
       couchbase_main_file = File.exists?(main_file) ? [main_file] : []
-      couchbase_namespaced_files = Dir.glob("#{Rails.root.to_s}/config/couchbase/**/*.yml")
-      couchbase_main_file.concat(couchbase_namespaced_files)
     end
   
     def create_cbsettings_class(yml_file)
       hash = load_yml(yml_file)
-      klass_name = File.basename(yml_file).gsub(".yml","").camelize
-      klass_name = "#{klass_name}CouchbaseSettings" unless klass_name=="CouchbaseSettings"
+      #klass_name = File.basename(yml_file).gsub(".yml","").camelize
+      klass_name = "CouchbaseSetting"
+      #klass_name = "#{klass_name}CouchbaseSetting" unless klass_name=="CouchbaseSetting"
       klass = Object.const_set(klass_name,Class.new)
       hash.each do |key,value|
+        #Rails.logger.debug "hash: key = #{key}, value = #{value}"
         klass.define_singleton_method(key){ value }
       end
       klass.class_eval do
@@ -44,3 +40,7 @@ module CouchbaseSettings
     end
   end # class << self
 end
+
+# Include Railtie after defining the module
+COUCHBASE_SETTINGS_PATH = "#{File.dirname(__FILE__)}/couchbase_settings"
+require "#{COUCHBASE_SETTINGS_PATH}/railtie.rb"
