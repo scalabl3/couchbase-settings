@@ -15,6 +15,7 @@ module CouchbaseSettings
     def find_ymls
       main_file = "#{Rails.root.to_s}/config/couchbase.yml"
       couchbase_main_file = File.exists?(main_file) ? [main_file] : []
+      couchbase_main_file
     end
   
     def create_cbsettings_class(yml_file)
@@ -27,6 +28,10 @@ module CouchbaseSettings
         #Rails.logger.debug "hash: key = #{key}, value = #{value}"
         klass.define_singleton_method(key){ value }
       end
+      
+      # add a method to inspect the entire yml hash
+      klass.define_singleton_method("inspect", hash)
+      
       klass.class_eval do
         def self.method_missing(method_id,*args)
           raise UndefinedCouchbaseSettings, "#{method_id} is not defined in #{self.to_s}"
