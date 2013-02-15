@@ -24,13 +24,14 @@ module CouchbaseSettings
       klass_name = "CouchbaseSetting"
       #klass_name = "#{klass_name}CouchbaseSetting" unless klass_name=="CouchbaseSetting"
       klass = Object.const_set(klass_name,Class.new)
+
       hash.each do |key,value|
         #Rails.logger.debug "hash: key = #{key}, value = #{value}"
         klass.define_singleton_method(key){ value }
       end
       
       # add a method to inspect the entire yml hash
-      klass.define_singleton_method("inspect") { hash }
+      klass.define_singleton_method("to_hash") { hash }
       
       klass.class_eval do
         def self.method_missing(method_id,*args)
