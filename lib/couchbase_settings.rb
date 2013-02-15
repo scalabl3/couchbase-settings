@@ -30,7 +30,7 @@ module CouchbaseSettings
       end
       
       # add a method to inspect the entire yml hash
-      klass.define_singleton_method("inspect", hash)
+      klass.define_singleton_method("inspect") { hash }
       
       klass.class_eval do
         def self.method_missing(method_id,*args)
